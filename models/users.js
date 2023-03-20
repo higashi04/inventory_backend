@@ -24,7 +24,7 @@ const EmployeeUserSchema = new Schema({
     active: Boolean,
     salary: Number
 });
-EmployeeUserSchema.plugin(AutoIncrement, {inc_field: 'id'});
+// EmployeeUserSchema.plugin(AutoIncrement, {inc_field: 'id'});
 EmployeeUserSchema.virtual('fullName').get( function() {
     return `${this.firstName} ${this.lastName}`
 });

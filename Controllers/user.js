@@ -11,34 +11,27 @@ const generateToken = (id) => {
 };
 
 const registerUser = async (req, res) => {
+  console.log(req.body)
   const {
     username,
     password,
     email,
     firstName,
     lastName,
-    phone,
-    hireDate,
-    active,
-    salary,
-  } = req.body;
-  if (
-    (!username,
-    !password,
-    !email,
-    !firstName,
-    !lastName,
-    !phone,
-    !hireDate,
-    !salary)
-  ) {
+  } = req.body.user;
+  if (!username || !password || !email || !firstName || !lastName) {
     res.status(400);
-    throw new Error("Please, provide all the required information.");
-  }
-  const userExists = await User.findOne({ username });
+    throw new Error("Please provide all the required information.");
+  } 
+  try {
+    const userExists = await User.findOne({ username });
+    console.log(userExists)
   if (userExists) {
     res.status(400);
     throw new Error(existingUserErr);
+  } 
+  } catch (error) {
+    console.log(error) 
   }
   const emailExists = await User.findOne({ email });
   if (emailExists) {
@@ -47,35 +40,41 @@ const registerUser = async (req, res) => {
   }
   const salt = await bcrypt.genSalt(10);
   const hashedPassword = await bcrypt.hash(password, salt);
+  const timeElapsed = Date.now();
+  const today = new Date(timeElapsed);
+  
+    const user = await User.create({
+      username,
+      email,
+      password: hashedPassword,
+      firstName,
+      lastName,
+      phone: "",
+      hireDate: today,
+      active: true,
+      salary: 0,
+    })
 
-  const user = await User.create({
-    username,
-    email,
-    password: hashedPassword,
-    firstName,
-    lastName,
-    phone,
-    hireDate,
-    active,
-    salary,
-  });
-  if (user) {
-    res.status(201).json({
-      _id: user.id,
-      username: user.username,
-      email: user.email,
-      firstName: user.firstName,
-      lastName: user.lastName,
-      phone: user.phone,
-      hireDate: user.hireDate,
-      active: user.active,
-      salary: user.salary,
-      token: generateToken(user._id),
-    });
-  } else {
-    res.status(400);
-    throw new Error("an error occurred, lol");
-  }
+    console.log(user)
+    if (user) {
+      res.status(201).json({
+        _id: user.id,
+        username: user.username,
+        email: user.email,
+        firstName: user.firstName,
+        lastName: user.lastName,
+        phone: user.phone,
+        hireDate: user.hireDate,
+        active: user.active,
+        salary: user.salary,
+        token: generateToken(user._id),
+      });
+    } else {
+      res.status(400);
+      throw new Error("an error occurred, lol");
+    }
+
+
 };
 
 const loginUser = async (req, res) => {

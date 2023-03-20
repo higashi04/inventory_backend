@@ -51,7 +51,7 @@ store.on("error", (e) => {
     console.log(e);
 });
 
-mongoose.connect(process.env.MONGO_SERVER);
+mongoose.connect(process.env.MONGO_SERVER, { useNewUrlParser: true });
 mongoose.connection.on("connected", () => {
     console.log("mongo atlas is on");
 });
